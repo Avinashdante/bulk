@@ -1,0 +1,151 @@
+const knex = require("./knex");
+
+
+
+const allRoutes = [
+  // about us
+  {
+    method: "GET",
+    path: "/aboutus",
+    handler: async (req, h) => {
+      // server.listen(3000);
+
+      let mst = 10
+      let privArray = [
+        {
+          privNumber: 1,
+          status: 1
+        },
+        {
+          privNumber: 2,
+          status: 2
+        },
+        {
+          privNumber: 4,
+          status: 3
+        }
+      ]
+      let promArray = []
+      await knex.transaction(async (trx) => {
+        for (let eac = 0; eac < privArray.length; eac++) {
+          await trx.raw(`INSERT INTO roles (mst, rp, rp_status)   
+           VALUES (${privArray[eac].status},${privArray[eac].status},${privArray[eac].status});`)
+            .then(data => {
+              console.log("percentage",((eac+1)/privArray.length)*100)
+              console.log("each", data)
+            })
+        }
+        console.log("completed")
+      });
+      // for (const eac of privArray) {
+      //   promArray.push(
+      //     JSON.stringify(
+      //       new Promise(async (resolve)=>{
+      //         await knex.raw(`INSERT INTO roles (mst, rp, rp_status)
+      //         VALUES (${eac.status},${eac.status},${eac.status});`)
+      //         .then(([eee]) => {
+      //           console.log(eee)
+      //           // data = eee
+      //           resolve(eee)
+      //         })
+      //       })
+      //     )
+
+      //   )
+      //   // await knex.raw(`UPDATE roles SET rp_status =  ${eac.status}  WHERE mst = ${mst} and rp = ${eac.privNumber}`).then(([eee]) => {
+      //   // console.log(`UPDATE roles SET rp_status = ${eac.status} WHERE mst = ${mst} and rp = ${eac.privNumber}`)
+      // }
+
+      // await Promise.all(promArray).then((f)=>{
+      //   console.log(f)
+      // })
+      // let data = []
+      // await knex.raw(`SELECT * FROM roles`).then(([eee]) => {
+      //   console.log(eee)
+      //   data = eee
+      // })
+
+
+
+
+      return {
+        success: true,
+        message: "",
+        // data
+      };
+    }
+  },
+
+  // get leaves
+  {
+    method: "POST",
+    path: "/post/vid",
+    handler: async (req, h) => {
+      console.log("payload", req.payload);
+
+      let rs;
+      let idToInsert;
+      await knex.raw(
+        `INSERT INTO tab1 (visitor_name) VALUES ("Avinash") `).then(
+          async ([results]) => {
+
+            // connection.release();
+            // Handle error after the release
+
+            // else callback(null,results);
+            console.log(results);
+            console.log(results.insertId);
+            // idToInsert = results.insertId
+            console.log("result testing!");
+            rs = {
+              success: true,
+              data: results[0],
+              idToInsert: results.insertId
+            };
+          }
+        ).catch(error => {
+          console.log('error in catch', error);
+
+          if (error) {
+            rs = {
+              success: false,
+              message: "Failed fetching info"
+            };
+          }
+        });
+
+      let dat = rs.idToInsert
+
+      await knex.raw(
+        `INSERT INTO tab2 (vid) VALUES (${dat})`).then(
+          async ([results]) => {
+
+            // connection.release();
+            // Handle error after the release
+
+            // else callback(null,results);
+            console.log(results);
+            console.log("result testing2!");
+            rs1 = {
+              success: true,
+              data: results[0]
+            };
+          }
+        ).catch(error => {
+          console.log('error in catch', error);
+
+          if (error) {
+            rs1 = {
+              success: false,
+              message: "Failed fetching at2"
+            };
+          }
+        })
+
+
+      return rs;
+    }
+  }
+];
+
+module.exports = allRoutes;
